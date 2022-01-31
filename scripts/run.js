@@ -1,25 +1,43 @@
 const main = async () => {
   const [_, randomPerson] = await hre.ethers.getSigners();
   const thumbsUpContractFactory = await  hre.ethers.getContractFactory("ThumbsUpPortal");
-  const thumbsUpContract = await thumbsUpContractFactory.deploy();
+  const thumbsUpContract = await thumbsUpContractFactory.deploy({
+    value: hre.ethers.utils.parseEther("0.1")
+  });
   await thumbsUpContract.deployed();
+  console.log("Contract addy: ", thumbsUpContract
+     .address);
 
-  console.log("Contract deployed to: ", thumbsUpContract.address);
-  // console.log("Contract deployed by: ", owner.address);
+  /*
+   * Get Contract balance
+   */
+  let contractBalance = await hre.ethers.provider.getBalance(
+     thumbsUpContract.address
+  );
 
-  let thumbsUpCount;
-  thumbsUpCount = await thumbsUpContract.getTotalThumbsUp();
-  console.log(thumbsUpCount.toNumber());
+  console.log(
+     "Contract balance:",
+     hre.ethers.utils.formatEther(contractBalance)
+  );
 
-  let thumbsUpTxn = await thumbsUpContract.thumbsUp("A Message");
+  /*
+   * Let's try two ThumbsUp now
+   */
+
+  let thumbsUpTxn = await thumbsUpContract.thumbsUp("This is thumbsUp #1");
   await thumbsUpTxn.wait();
 
-  thumbsUpCount = await thumbsUpContract.getTotalThumbsUp();
+  let thumbsUpTxn2 = await thumbsUpContract.thumbsUp("This is thumbsUp #2");
+  await thumbsUpTxn2.wait();
+  /*
+   * Get Contract balance to see what happened!
+   */
+  contractBalance = await hre.ethers.provider.getBalance(thumbsUpContract.address);
+  console.log(
+     "Contract balance: ",
+     hre.ethers.utils.formatEther(contractBalance)
+  );
 
-  thumbsUpTxn = await thumbsUpContract.connect(randomPerson).thumbsUp("Another Message");
-  await thumbsUpTxn.wait();
-
-  // thumbsUpCount = await thumbsUpContract.getTotalThumbsUp();
   let allThumbsUps = await thumbsUpContract.getAllThumbsUps();
   console.log(allThumbsUps);
 };

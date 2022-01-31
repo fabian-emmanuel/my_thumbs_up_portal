@@ -1,5 +1,5 @@
 require("@nomiclabs/hardhat-waffle");
-//ThumbsUpPortal address:  0x3858B158DDbD5f00dd075Dd140141C95F160c570
+require("dotenv").config();
 module.exports = {
   solidity: "0.8.4",
   networks: {
